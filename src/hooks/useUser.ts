@@ -2,24 +2,46 @@ import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { User as SupabaseUser } from '@supabase/supabase-js';
 
-// 캐시된 사용자 정보를 저장할 전역 변수
-let cachedUserProfile: { name: string | null; profileImage: string | null } | null = null;
+interface UserProfile {
+  name: string | null;
+  profileImage: string | null;
+  lastUpdated: number;
+}
+
+const CACHE_DURATION = 5 * 60 * 1000; // 5분
+
+const getCachedProfile = (): UserProfile | null => {
+  const cached = localStorage.getItem('userProfile');
+  if (!cached) return null;
+
+  const profile = JSON.parse(cached) as UserProfile;
+  if (Date.now() - profile.lastUpdated > CACHE_DURATION) {
+    localStorage.removeItem('userProfile');
+    return null;
+  }
+
+  return profile;
+};
+
+const setCachedProfile = (name: string | null, profileImage: string | null) => {
+  const profile: UserProfile = {
+    name,
+    profileImage,
+    lastUpdated: Date.now()
+  };
+  localStorage.setItem('userProfile', JSON.stringify(profile));
+};
 
 export const useUser = () => {
+  const cachedProfile = getCachedProfile();
   const [user, setUser] = useState<SupabaseUser | null>(null);
-  const [name, setName] = useState<string | null>(cachedUserProfile?.name || null);
-  const [profileImage, setProfileImageUrl] = useState<string | null>(cachedUserProfile?.profileImage || null);
-  const [loading, setLoading] = useState(!cachedUserProfile);
+  const [name, setName] = useState<string | null>(cachedProfile?.name || null);
+  const [profileImage, setProfileImageUrl] = useState<string | null>(cachedProfile?.profileImage || null);
+  const [loading, setLoading] = useState(!cachedProfile);
   const [error, setError] = useState<string | null>(null);
 
   const fetchUserProfile = async (user: SupabaseUser) => {
     try {
-      // 캐시된 정보가 있으면 먼저 사용
-      if (cachedUserProfile) {
-        setName(cachedUserProfile.name);
-        setProfileImageUrl(cachedUserProfile.profileImage);
-      }
-
       const { data: profileData, error: profileError } = await supabase
         .from('users')
         .select('*')
@@ -32,12 +54,7 @@ export const useUser = () => {
         const newName = profileData.name || null;
         const newProfileImage = profileData.profile_image || null;
         
-        // 캐시 업데이트
-        cachedUserProfile = {
-          name: newName,
-          profileImage: newProfileImage
-        };
-
+        setCachedProfile(newName, newProfileImage);
         setName(newName);
         setProfileImageUrl(newProfileImage);
       }
@@ -58,6 +75,9 @@ export const useUser = () => {
         if (session?.user) {
           setUser(session.user);
           await fetchUserProfile(session.user);
+        } else {
+          // 세션이 없으면 캐시 삭제
+          localStorage.removeItem('userProfile');
         }
       } catch (err) {
         if (!isMounted) return;
@@ -83,7 +103,7 @@ export const useUser = () => {
         setUser(null);
         setName(null);
         setProfileImageUrl(null);
-        cachedUserProfile = null;  // 로그아웃 시 캐시 초기화
+        localStorage.removeItem('userProfile');
         setLoading(false);
       }
     });
