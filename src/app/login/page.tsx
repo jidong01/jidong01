@@ -27,7 +27,7 @@ export default function LoginPage() {
       }
 
       if (data.user) {
-        router.push('/');
+        window.location.href = '/';
       }
     } catch {
       // setError('로그인 중 오류가 발생했습니다.');

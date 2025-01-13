@@ -11,17 +11,17 @@ import { useUser } from "@/hooks/useUser";
 
 export default function MainPage() {
   const router = useRouter();
-  const { user, loading: userLoading } = useUser();
+  const { user } = useUser();
   const [selectedFilter, setSelectedFilter] = useState<'all' | 'popular'>('all');
   const { currentGroupName, currentBoardName, selectedGroupId, selectedBoardId } = useBoards();
 
   useEffect(() => {
-    if (!userLoading && !user) {
-      router.replace('/login');
+    if (!user) {
+      window.location.href = '/login';
     }
-  }, [user, userLoading, router]);
+  }, [user, router]);
 
-  if (userLoading && !user) {
+  if (!user) {
     return (
       <div className="flex justify-center items-center min-h-screen">
         <div className="text-gray-500">로딩 중...</div>
@@ -34,7 +34,7 @@ export default function MainPage() {
       alert('게시판을 선택해주세요.');
       return;
     }
-    router.push('/posts/create');
+    window.location.href = '/posts/create';
   };
 
   const title = currentGroupName ? currentGroupName : '전체 게시판';
