@@ -25,6 +25,8 @@ export default function LoginPage() {
       }
 
       if (data.user) {
+        // 세션이 설정될 때까지 잠시 대기
+        await new Promise(resolve => setTimeout(resolve, 1000));
         window.location.href = '/';
       }
     } catch {

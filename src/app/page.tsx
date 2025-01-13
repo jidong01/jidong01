@@ -1,37 +1,37 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { TopNavigation } from "@/components/common/TopNavigation";
 import { PostFilter } from "@/components/common/PostFilter";
 import { PostList } from "@/components/post/PostList";
 import { CreatePostButton } from "@/components/common/CreatePostButton";
 import { useBoards } from "@/hooks/useBoards";
-import { useUser } from "@/hooks/useUser";
+import { supabase } from '@/lib/supabase';
 
 export default function MainPage() {
-  const { user } = useUser();
+  const router = useRouter();
   const [selectedFilter, setSelectedFilter] = useState<'all' | 'popular'>('all');
   const { currentGroupName, currentBoardName, selectedGroupId, selectedBoardId } = useBoards();
 
   useEffect(() => {
     const checkAuth = async () => {
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      if (!user) {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) {
+          window.location.href = '/login';
+        } else {
+          console.log('인증 확인 완료');
+        }
+      } catch (error) {
+        console.error('인증 확인 중 오류 발생:', error);
         window.location.href = '/login';
       }
     };
-    
-    checkAuth();
-  }, [user]);
 
-  if (!user) {
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        <div className="text-gray-500">로딩 중...</div>
-      </div>
-    );
-  }
+    checkAuth();
+  }, [router]);
+
 
   const handleCreatePost = () => {
     if (!selectedGroupId || !selectedBoardId) {
