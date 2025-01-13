@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { TopNavigation } from "@/components/common/TopNavigation";
@@ -16,10 +16,27 @@ interface AttachedImage {
   file?: File;
 }
 
-function CreatePostContent() {
+function LoadingView() {
+  return (
+    <div className="flex justify-center min-h-screen bg-white">
+      <div className="w-full max-w-[390px] flex flex-col relative">
+        <TopNavigation
+          type="post-create"
+          title="로딩 중..."
+          titleSize="small"
+        />
+        <div className="pt-[52px] flex justify-center items-center">
+          <div className="text-gray-500">로딩 중...</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function CreatePostForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { selectedGroupId, selectedBoardId, currentGroupName } = useBoards();
+  const { boardGroups, selectedGroupId, selectedBoardId, currentGroupName } = useBoards();
   const { editPost, addPost } = usePosts();
 
   const isEditMode = searchParams.get('edit') === 'true';
@@ -142,22 +159,7 @@ function CreatePostContent() {
   };
 
   if (loading) {
-    return (
-      <div className="flex justify-center min-h-screen bg-white">
-        <div className="w-full max-w-[390px] flex flex-col relative">
-          <TopNavigation
-            type="post-create"
-            title={boardTitle}
-            subtitle={boardSubtitle}
-            onLeftClick={handleCancel}
-            titleSize="small"
-          />
-          <div className="pt-[52px] flex justify-center items-center">
-            <div className="text-gray-500">로딩 중...</div>
-          </div>
-        </div>
-      </div>
-    );
+    return <LoadingView />;
   }
 
   return (
@@ -238,5 +240,9 @@ function CreatePostContent() {
 }
 
 export default function CreatePostPage() {
-  return <CreatePostContent />;
+  return (
+    <Suspense fallback={<LoadingView />}>
+      <CreatePostForm />
+    </Suspense>
+  );
 }
