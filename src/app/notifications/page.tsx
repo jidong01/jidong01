@@ -5,10 +5,8 @@ import { TopNavigation } from '@/components/common/TopNavigation';
 import { NotificationItem } from "@/components/notification/NotificationItem";
 import { useNotifications } from '@/hooks/useNotifications';
 import { Notification } from '@/types/notification';
-import { useRouter } from 'next/navigation';
 
 export default function NotificationsPage() {
-  const router = useRouter();
   const { notifications, loading } = useNotifications();
 
   const getNotificationMessage = (notification: Notification) => {
@@ -33,7 +31,7 @@ export default function NotificationsPage() {
           <TopNavigation
             type="notification"
             title="알림"
-            onLeftClick={() => router.back()}
+            onLeftClick={() => window.history.back()}
             titleSize="large"
           />
           <div className="pt-[52px] w-full flex justify-center items-center">
@@ -50,7 +48,7 @@ export default function NotificationsPage() {
         <TopNavigation
           type="notification"
           title="알림"
-          onLeftClick={() => router.back()}
+          onLeftClick={() => window.history.back()}
           titleSize="large"
         />
         <div className="pt-[52px] w-full">
@@ -68,7 +66,7 @@ export default function NotificationsPage() {
                 content={getNotificationMessage(notification)}
                 isRead={notification.isRead}
                 onClick={() => {
-                  router.push(`/posts/${notification.postId}`);
+                  window.location.href = `/posts/${notification.postId}`;
                 }}
               />
             ))
