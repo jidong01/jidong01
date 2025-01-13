@@ -2,13 +2,11 @@
 
 import React, { useState } from 'react';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
 import { TextField } from '@/components/common/TextField';
 import logo from '@/assets/images/logo.png';
 import { supabase } from '@/lib/supabase';
 
 export default function LoginPage() {
-  const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   // const [error, setError] = useState(''); 추후 사용하면 좋을 코드
@@ -78,7 +76,7 @@ export default function LoginPage() {
               </span>
             </button>
             <button
-              onClick={() => router.push('/signup')}
+              onClick={() => window.location.href = '/signup'}
               className="flex justify-center items-center py-2 w-full h-9 bg-gray-50 rounded-[33px]"
             >
               <span className="text-sm font-semibold leading-5 tracking-[-0.2px] text-gray-400">

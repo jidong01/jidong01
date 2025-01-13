@@ -5,20 +5,18 @@ import { TopNavigation } from '@/components/common/TopNavigation';
 import { ProfileSection } from "@/components/menu/ProfileSection";
 import { BoardGroupSection } from "@/components/menu/BoardGroupSection";
 import { CreateBoardButton } from "@/components/menu/CreateBoardButton";
-import { useRouter } from 'next/navigation';
 import { useBoards } from '@/hooks/useBoards';
 import { useUser } from '@/hooks/useUser';
 import { supabase } from '@/lib/supabase';
 
 export default function MenuPage() {
-  const router = useRouter();
   const { boardGroups } = useBoards();
   const { name, profileImage } = useUser();
 
   const handleLogout = async () => {
     try {
       await supabase.auth.signOut();
-      router.push('/login');
+      window.location.href = '/login';
     } catch (error) {
       console.error('로그아웃 중 오류가 발생했습니다:', error);
       alert('로그아웃 중 오류가 발생했습니다.');
@@ -30,7 +28,7 @@ export default function MenuPage() {
       <TopNavigation
         type="menu"
         title="메뉴"
-        onLeftClick={() => router.back()}
+        onLeftClick={() => window.history.back()}
         titleSize="large"
       />
       <div className="pt-[52px] w-full">

@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import { TopNavigation } from "@/components/common/TopNavigation";
 import { PostFilter } from "@/components/common/PostFilter";
 import { PostList } from "@/components/post/PostList";
@@ -10,16 +9,21 @@ import { useBoards } from "@/hooks/useBoards";
 import { useUser } from "@/hooks/useUser";
 
 export default function MainPage() {
-  const router = useRouter();
   const { user } = useUser();
   const [selectedFilter, setSelectedFilter] = useState<'all' | 'popular'>('all');
   const { currentGroupName, currentBoardName, selectedGroupId, selectedBoardId } = useBoards();
 
   useEffect(() => {
-    if (!user) {
-      window.location.href = '/login';
-    }
-  }, [user, router]);
+    const checkAuth = async () => {
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      if (!user) {
+        window.location.href = '/login';
+      }
+    };
+    
+    checkAuth();
+  }, [user]);
 
   if (!user) {
     return (
@@ -45,8 +49,8 @@ export default function MainPage() {
         type="main"
         title={title}
         subtitle={currentBoardName || undefined}
-        onLeftClick={() => router.push('/menu')}
-        onRightClick={() => router.push('/notifications')}
+        onLeftClick={() => window.location.href = '/menu'}
+        onRightClick={() => window.location.href = '/notifications'}
         titleSize={title === '전체 게시판' ? 'large' : 'small'}
       />
       <div className="pt-[52px] bg-gray-50">

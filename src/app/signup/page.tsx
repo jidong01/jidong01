@@ -1,14 +1,12 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { TextField } from '@/components/common/TextField';
 import { TopNavigation } from '@/components/common/TopNavigation';
 import { supabase } from '@/lib/supabase';
 import { isValidEmail, isValidPassword } from '@/lib/utils';
 
 export default function SignupPage() {
-  const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -83,7 +81,7 @@ export default function SignupPage() {
           return;
         }
         
-        router.push('/');
+        window.location.href = '/';
       }
     } catch {
       // setError('회원가입 중 오류가 발생했습니다.');
@@ -96,7 +94,7 @@ export default function SignupPage() {
       <TopNavigation
         type="signup"
         title="회원가입"
-        onLeftClick={() => router.push('/login')}
+        onLeftClick={() => window.location.href = '/login'}
         titleSize="large"
       />
       

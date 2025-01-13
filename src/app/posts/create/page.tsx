@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo, useEffect, Suspense } from 'react';
 import Image from 'next/image';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { TopNavigation } from "@/components/common/TopNavigation";
 import ImageDeleteIcon from '@/assets/icons/image-delete.svg';
 import CameraGrayIcon from '@/assets/icons/camera-gray.svg';
@@ -16,7 +16,6 @@ interface AttachedImage {
 }
 
 function CreatePostContent() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const { boardGroups, selectedGroupId, selectedBoardId, currentGroupName } = useBoards();
   const { editPost, addPost } = usePosts();
@@ -64,7 +63,7 @@ function CreatePostContent() {
           title: title.trim(),
           content: content.trim()
         });
-        router.back();
+        window.history.back();
       } else {
         if (!selectedGroupId || !selectedBoardId) {
           alert('게시판을 선택해주세요.');
@@ -98,7 +97,7 @@ function CreatePostContent() {
           .map(img => img.file!);
 
         await addPost(selectedBoardId, newPost, files);
-        router.push('/');
+        window.location.href = '/';
       }
     } catch (error) {
       console.error('Error submitting post:', error);
@@ -107,7 +106,7 @@ function CreatePostContent() {
   };
 
   const handleCancel = () => {
-    router.push('/');
+    window.location.href = '/';
   };
 
   const handleDeleteImage = (id: string) => {
