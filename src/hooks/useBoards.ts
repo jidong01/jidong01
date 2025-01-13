@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
-import { BoardGroup, Board, Post } from '@/types/board';
+import { BoardGroup, Board } from '@/types/board';
 
 interface CommentUser {
   id: string;

@@ -19,7 +19,7 @@ interface AttachedImage {
 function CreatePostContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { boardGroups, selectedGroupId, selectedBoardId, currentGroupName } = useBoards();
+  const { selectedGroupId, selectedBoardId, currentGroupName } = useBoards();
   const { editPost, addPost } = usePosts();
 
   const isEditMode = searchParams.get('edit') === 'true';
