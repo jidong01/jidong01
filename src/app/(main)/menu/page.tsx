@@ -12,7 +12,7 @@ import { supabase } from '@/lib/supabase';
 
 export default function MenuPage() {
   const router = useRouter();
-  const { boardGroups, loading, error } = useBoards();
+  const { boardGroups } = useBoards();
   const { name, profileImage } = useUser();
 
   const handleLogout = async () => {

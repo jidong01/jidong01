@@ -11,7 +11,7 @@ export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState(''); // 추후 사용하면 좋을 코드
+  // const [error, setError] = useState(''); 추후 사용하면 좋을 코드
 
   const handleLogin = async () => {
     try {
@@ -21,7 +21,7 @@ export default function LoginPage() {
       });
 
       if (error) {
-        setError('이메일 또는 비밀번호가 올바르지 않습니다.');
+      //   setError('이메일 또는 비밀번호가 올바르지 않습니다.');
         alert('이메일 또는 비밀번호가 올바르지 않습니다.');
         return;
       }
@@ -29,8 +29,8 @@ export default function LoginPage() {
       if (data.user) {
         router.push('/');
       }
-    } catch (err) {
-      setError('로그인 중 오류가 발생했습니다.');
+    } catch {
+      // setError('로그인 중 오류가 발생했습니다.');
       alert('로그인 중 오류가 발생했습니다.');
     }
   };

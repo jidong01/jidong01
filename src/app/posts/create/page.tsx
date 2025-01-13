@@ -18,13 +18,12 @@ interface AttachedImage {
 export default function CreatePostPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { boardGroups, selectedGroupId, selectedBoardId, currentGroupName, currentBoardName } = useBoards();
+  const { boardGroups, selectedGroupId, selectedBoardId, currentGroupName } = useBoards();
   const { editPost, addPost } = usePosts();
 
   const isEditMode = searchParams.get('edit') === 'true';
   const postId = searchParams.get('postId');
 
-  // 수정할 게시글 찾기
   const editingPost = useMemo(() => {
     if (!isEditMode || !postId || !boardGroups.length) return null;
 
@@ -34,12 +33,10 @@ export default function CreatePostPage() {
       .find(p => p.id === postId);
   }, [isEditMode, postId, boardGroups]);
 
-  // 기존 게시글 내용으로 초기화
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [attachedImages, setAttachedImages] = useState<AttachedImage[]>([]);
 
-  // boardGroups가 로드되면 게시글 내용 설정
   useEffect(() => {
     if (editingPost) {
       setTitle(editingPost.title);
@@ -63,14 +60,12 @@ export default function CreatePostPage() {
 
     try {
       if (isEditMode && postId && editingPost) {
-        // 수정 모드
         await editPost(postId, {
           title: title.trim(),
           content: content.trim()
         });
         router.back();
       } else {
-        // 새 게시글 작성
         if (!selectedGroupId || !selectedBoardId) {
           alert('게시판을 선택해주세요.');
           return;
@@ -98,7 +93,6 @@ export default function CreatePostPage() {
           comments: []
         };
 
-        // 이미지 파일 배열 생성 - 저장된 File 객체 직접 사용
         const files = attachedImages
           .filter(img => img.file)
           .map(img => img.file!);

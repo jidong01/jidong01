@@ -24,7 +24,7 @@ export function CommentList({
   onEditStart,
   onReplyStart
 }: CommentListProps) {
-  const { posts, deleteComment, deleteReply, editComment, editReply } = usePosts();
+  const { posts, deleteComment, deleteReply } = usePosts();
   const { user } = useUser();
   const post = posts.find(p => p.id === postId);
   const comments = post?.comments || [];
@@ -42,8 +42,6 @@ export function CommentList({
       {comments.map((comment: Comment) => (
         <CommentItem
           key={comment.id}
-          id={comment.id}
-          postId={postId}
           author={comment.user.name}
           content={comment.content}
           createdAt={comment.createdAt || ''}

@@ -10,7 +10,7 @@ interface PostListProps {
 }
 
 export function PostList({ className = '' }: PostListProps) {
-  const { posts, loading, error } = usePosts();
+  const { posts } = usePosts();
 
   if (posts.length === 0) {
     return (

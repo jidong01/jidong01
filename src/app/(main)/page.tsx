@@ -7,13 +7,11 @@ import { PostFilter } from "@/components/common/PostFilter";
 import { PostList } from "@/components/post/PostList";
 import { CreatePostButton } from "@/components/common/CreatePostButton";
 import { useBoards } from "@/hooks/useBoards";
-import { usePosts } from "@/hooks/usePosts";
 
 export default function MainPage() {
   const router = useRouter();
   const [selectedFilter, setSelectedFilter] = useState<'all' | 'popular'>('all');
   const { currentGroupName, currentBoardName, selectedGroupId, selectedBoardId, loading: boardsLoading } = useBoards();
-  const { posts, loading: postsLoading } = usePosts();
 
   if (boardsLoading) return null;
 

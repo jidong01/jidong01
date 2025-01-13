@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
-import { BoardGroup } from '@/types/board';
+import { BoardGroup, Board } from '@/types/board';
 
 export const useBoards = () => {
   const [boardGroups, setBoardGroups] = useState<BoardGroup[]>([]);
@@ -46,8 +46,8 @@ export const useBoards = () => {
       }
       if (savedBoardId) {
         const board = savedGroups.find((g: BoardGroup) => 
-          g.boards.some((b: any) => b.id === savedBoardId)
-        )?.boards.find((b: any) => b.id === savedBoardId);
+          g.boards.some((b: Board) => b.id === savedBoardId)
+        )?.boards.find((b: Board) => b.id === savedBoardId);
         setCurrentBoardName(board?.name || null);
       }
     }

@@ -13,29 +13,29 @@ export default function SignupPage() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [name, setName] = useState('');
-  const [error, setError] = useState(''); // 추후 사용하면 좋을 코드
+  // const [error, setError] = useState(''); 추후 사용하면 좋을 코드
 
   const validateForm = () => {
     if (!email || !password || !confirmPassword || !name) {
-      setError('모든 필드를 입력해주세요.');
+      // setError('모든 필드를 입력해주세요.');
       alert('모든 필드를 입력해주세요.');
       return false;
     }
 
     if (!isValidEmail(email)) {
-      setError('올바른 이메일 형식이 아닙니다.');
+      // setError('올바른 이메일 형식이 아닙니다.');
       alert('올바른 이메일 형식이 아닙니다.');
       return false;
     }
 
     if (!isValidPassword(password)) {
-      setError('비밀번호는 영문, 숫자를 포함한 8자 이상이어야 합니다.');
+      // setError('비밀번호는 영문, 숫자를 포함한 8자 이상이어야 합니다.');
       alert('비밀번호는 영문, 숫자를 포함한 8자 이상이어야 합니다.');
       return false;
     }
 
     if (password !== confirmPassword) {
-      setError('비밀번호가 일치하지 않습니다.');
+      // setError('비밀번호가 일치하지 않습니다.');
       alert('비밀번호가 일치하지 않습니다.');
       return false;
     }
@@ -56,10 +56,10 @@ export default function SignupPage() {
 
       if (authError) {
         if (authError.status === 429) {
-          setError('잠시 후 다시 시도해주세요.');
+          // setError('잠시 후 다시 시도해주세요.');
           return;
         }
-        setError('회원가입 중 오류가 발생했습니다.');
+        // setError('회원가입 중 오류가 발생했습니다.');
         alert('회원가입 중 오류가 발생했습니다.');
         return;
       }
@@ -78,15 +78,15 @@ export default function SignupPage() {
         
         if (userError) {
           console.error('유저 정보 저장 에러:', userError);
-          setError('유저 정보 저장 중 오류가 발생했습니다.');
+          // setError('유저 정보 저장 중 오류가 발생했습니다.');
           alert('유저 정보 저장 중 오류가 발생했습니다.');
           return;
         }
         
         router.push('/');
       }
-    } catch (err) {
-      setError('회원가입 중 오류가 발생했습니다.');
+    } catch {
+      // setError('회원가입 중 오류가 발생했습니다.');
       alert('회원가입 중 오류가 발생했습니다.');
     }
   };

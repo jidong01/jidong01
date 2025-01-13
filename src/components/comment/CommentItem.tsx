@@ -8,8 +8,6 @@ import { ReplyComment } from './ReplyComment';
 import { SettingModal } from './SettingModal';
 
 interface CommentItemProps {
-  id: string;
-  postId: string;
   author: string;
   content: string;
   createdAt: string;
@@ -31,8 +29,6 @@ interface CommentItemProps {
 }
 
 export function CommentItem({
-  id,
-  postId,
   author,
   content,
   createdAt,

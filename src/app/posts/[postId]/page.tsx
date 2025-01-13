@@ -11,7 +11,7 @@ import { usePosts } from '@/hooks/usePosts';
 export default function PostDetailPage() {
   const { postId } = useParams();
   const { currentGroupName, currentBoardName, loading: boardsLoading } = useBoards();
-  const { posts, loading: postsLoading } = usePosts();
+  const { posts } = usePosts();
   const [editingComment, setEditingComment] = useState<{
     id: string;
     content: string;

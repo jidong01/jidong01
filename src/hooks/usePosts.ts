@@ -1,10 +1,46 @@
 'use client';
 
-import React, { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { Post, PostFilter } from '@/types/post';
 import { useBoards } from '@/hooks/useBoards';
 import { createNotification } from '@/lib/notification';
+
+interface CommentData {
+  id: string;
+  content: string;
+  created_at: string;
+  parent_id: string | null;
+  users: {
+    id: string;
+    name: string;
+    profile_image: string | null;
+  };
+}
+
+interface CommentResponse {
+  id: string;
+  content: string;
+  created_at: string;
+  users: {
+    id: string;
+    name: string;
+    profile_image: string | null;
+  };
+}
+
+interface RealtimeCommentResponse {
+  id: string;
+  content: string;
+  post_id: string;
+  parent_id: string | null;
+  created_at: string;
+  users: {
+    id: string;
+    name: string;
+    profile_image: string | null;
+  };
+}
 
 export const usePosts = () => {
   const { selectedGroupId, selectedBoardId } = useBoards();
@@ -104,8 +140,8 @@ export const usePosts = () => {
           })) || [],
         },
         comments: post.comments
-          ?.filter((comment: any) => !comment.parent_id)
-          ?.map((comment: any) => ({
+          ?.filter((comment: CommentData) => !comment.parent_id)
+          ?.map((comment: CommentData) => ({
             id: comment.id,
             content: comment.content,
             user: {
@@ -115,8 +151,8 @@ export const usePosts = () => {
             },
             createdAt: comment.created_at,
             replies: post.comments
-              ?.filter((reply: any) => reply.parent_id === comment.id)
-              ?.map((reply: any) => ({
+              ?.filter((reply: CommentData) => reply.parent_id === comment.id)
+              ?.map((reply: CommentData) => ({
                 id: reply.id,
                 content: reply.content,
                 user: {
@@ -185,7 +221,7 @@ export const usePosts = () => {
         }
       }
 
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('posts')
         .insert({
           board_id: boardId,
@@ -374,7 +410,7 @@ export const usePosts = () => {
             profile_image
           )
         `)
-        .single();
+        .single() as { data: CommentResponse | null; error: Error };
 
       if (error) {
         setPosts(prevPosts => prevPosts.map(post => ({
@@ -409,9 +445,9 @@ export const usePosts = () => {
 
       if (newComment && newComment.users) {
         const userInfo = {
-          id: (newComment.users as any).id as string,
-          name: (newComment.users as any).name as string,
-          profile_image: ((newComment.users as any).profile_image as string | null) || '/images/default-profile.png'
+          id: newComment.users.id,
+          name: newComment.users.name,
+          profile_image: newComment.users.profile_image || '/images/default-profile.png'
         };
         setPosts(prevPosts => prevPosts.map(post => {
           if (post.id !== postId) return post;
@@ -514,7 +550,7 @@ export const usePosts = () => {
             profile_image
           )
         `)
-        .single();
+        .single() as { data: CommentResponse | null; error: Error };
 
       // 게시글과 댓글 정보를 직접 조회하여 알림 생성
       const { data: postData } = await supabase
@@ -533,7 +569,7 @@ export const usePosts = () => {
         .single();
 
       if (postData) {
-        const comment = postData.comments.find((c: any) => c.id === commentId);
+        const comment = postData.comments.find((c: CommentData) => c.id === commentId);
         if (comment) {
           await createNotification({
             userId: comment.author_id,
@@ -560,9 +596,9 @@ export const usePosts = () => {
 
       if (newReply && newReply.users) {
         const userInfo = {
-          id: (newReply.users as any).id as string,
-          name: (newReply.users as any).name as string,
-          profile_image: ((newReply.users as any).profile_image as string | null) || '/images/default-profile.png'
+          id: newReply.users.id,
+          name: newReply.users.name,
+          profile_image: newReply.users.profile_image || '/images/default-profile.png'
         };
 
         setPosts(prevPosts => prevPosts.map(post => {
@@ -652,13 +688,13 @@ export const usePosts = () => {
                 )
               `)
               .eq('id', payload.new.id)
-              .single();
+              .single() as { data: RealtimeCommentResponse | null };
 
             if (comment) {
               const userInfo = {
-                id: (comment.users as any).id as string,
-                name: (comment.users as any).name as string,
-                profile_image: ((comment.users as any).profile_image as string | null) || '/images/default-profile.png'
+                id: comment.users.id,
+                name: comment.users.name,
+                profile_image: comment.users.profile_image || '/images/default-profile.png'
               };
               
               setPosts(prevPosts => prevPosts.map(post => {

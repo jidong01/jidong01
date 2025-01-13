@@ -18,8 +18,6 @@ export function NotificationItem({
   boardGroup,
   boardName,
   content,
-  type,
-  isRead = false,
   onClick
 }: NotificationItemProps) {
   return (
