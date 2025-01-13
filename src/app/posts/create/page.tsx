@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, Suspense } from 'react';
 import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { TopNavigation } from "@/components/common/TopNavigation";
@@ -15,7 +15,7 @@ interface AttachedImage {
   file?: File;
 }
 
-export default function CreatePostPage() {
+function CreatePostContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { boardGroups, selectedGroupId, selectedBoardId, currentGroupName } = useBoards();
@@ -201,5 +201,13 @@ export default function CreatePostPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function CreatePostPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <CreatePostContent />
+    </Suspense>
   );
 }
