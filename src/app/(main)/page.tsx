@@ -13,7 +13,7 @@ export default function MainPage() {
   const router = useRouter();
   const { user, loading: userLoading } = useUser();
   const [selectedFilter, setSelectedFilter] = useState<'all' | 'popular'>('all');
-  const { currentGroupName, currentBoardName, selectedGroupId, selectedBoardId, loading: boardsLoading } = useBoards();
+  const { currentGroupName, currentBoardName, selectedGroupId, selectedBoardId } = useBoards();
 
   useEffect(() => {
     if (!userLoading && !user) {
