@@ -39,7 +39,10 @@ export default function MainPage() {
         type="main"
         title={title}
         subtitle={currentBoardName || undefined}
-        onLeftClick={() => router.push('/(main)/menu')}
+        onLeftClick={() => {
+          const menuPath = window.location.pathname.includes('(main)') ? '/(main)/menu' : '/menu';
+          router.push(menuPath);
+        }}
         onRightClick={() => router.push('/notifications')}
         titleSize={title === '전체 게시판' ? 'large' : 'small'}
       />
