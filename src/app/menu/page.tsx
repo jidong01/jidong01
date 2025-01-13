@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { TopNavigation } from '@/components/common/TopNavigation';
 import { ProfileSection } from "@/components/menu/ProfileSection";
 import { BoardGroupSection } from "@/components/menu/BoardGroupSection";
@@ -12,16 +12,19 @@ import { supabase } from '@/lib/supabase';
 export default function MenuPage() {
   const { boardGroups } = useBoards();
   const { name, profileImage, loading } = useUser();
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
 
   useEffect(() => {
+    if (!loading && isInitialLoading) {
+      setIsInitialLoading(false);
+    }
+
     const timeout = setTimeout(() => {
-      if (loading) {
-        window.location.reload();
-      }
-    }, 1500);
+      setIsInitialLoading(false);
+    }, 3000);
 
     return () => clearTimeout(timeout);
-  }, [loading]);
+  }, [loading, isInitialLoading]);
 
   const handleLogout = async () => {
     try {
@@ -33,7 +36,7 @@ export default function MenuPage() {
     }
   };
 
-  if (loading) {
+  if (loading && isInitialLoading) {
     return (
       <>
         <TopNavigation
