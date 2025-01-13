@@ -1,19 +1,27 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { TopNavigation } from "@/components/common/TopNavigation";
 import { PostFilter } from "@/components/common/PostFilter";
 import { PostList } from "@/components/post/PostList";
 import { CreatePostButton } from "@/components/common/CreatePostButton";
 import { useBoards } from "@/hooks/useBoards";
+import { useUser } from "@/hooks/useUser";
 
 export default function MainPage() {
   const router = useRouter();
+  const { isAuthenticated } = useUser();
   const [selectedFilter, setSelectedFilter] = useState<'all' | 'popular'>('all');
   const { currentGroupName, currentBoardName, selectedGroupId, selectedBoardId, loading: boardsLoading } = useBoards();
 
-  if (boardsLoading) return null;
+  useEffect(() => {
+    if (!isAuthenticated) {
+      router.push('/login');
+    }
+  }, [isAuthenticated, router]);
+
+  if (boardsLoading || !isAuthenticated) return null;
 
   const handleCreatePost = () => {
     if (!selectedGroupId || !selectedBoardId) {
