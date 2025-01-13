@@ -1,6 +1,39 @@
 import { useEffect, useState, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
-import { BoardGroup, Board } from '@/types/board';
+import { BoardGroup, Board, Post } from '@/types/board';
+
+interface CommentUser {
+  id: string;
+  name: string;
+  profile_image: string | null;
+}
+
+interface Comment {
+  id: string;
+  content: string;
+  created_at: string;
+  parent_id: string | null;
+  users: CommentUser;
+}
+
+interface Like {
+  id: string;
+  user_id: string;
+  users: CommentUser;
+}
+
+interface PostData {
+  id: string;
+  title: string;
+  content: string;
+  board_id: string;
+  board_group_id: string;
+  created_at: string;
+  users: CommentUser;
+  images: string[];
+  likes: Like[];
+  comments: Comment[];
+}
 
 export const useBoards = () => {
   const [boardGroups, setBoardGroups] = useState<BoardGroup[]>([]);
@@ -80,6 +113,40 @@ export const useBoards = () => {
 
         if (boardsError) throw boardsError;
 
+        const { data: postsData, error: postsError } = await supabase
+          .from('posts')
+          .select(`
+            *,
+            users:author_id(
+              id,
+              name,
+              profile_image
+            ),
+            likes(
+              id,
+              user_id,
+              users(
+                id,
+                name,
+                profile_image
+              )
+            ),
+            comments(
+              id,
+              content,
+              created_at,
+              parent_id,
+              users:author_id(
+                id,
+                name,
+                profile_image
+              )
+            )
+          `)
+          .order('created_at', { ascending: false });
+
+        if (postsError) throw postsError;
+
         const formattedGroups = groupsData.map(group => ({
           id: group.id,
           name: group.name,
@@ -89,7 +156,58 @@ export const useBoards = () => {
               id: board.id,
               group_id: board.group_id,
               name: board.name,
-              posts: []
+              posts: postsData
+                .filter((post: PostData) => post.board_id === board.id)
+                .map((post: PostData) => ({
+                  id: post.id,
+                  title: post.title,
+                  content: post.content,
+                  boardId: post.board_id,
+                  boardGroupId: post.board_group_id,
+                  boardGroup: {
+                    id: group.id,
+                    name: group.name
+                  },
+                  createdAt: post.created_at,
+                  author: {
+                    id: post.users.id,
+                    name: post.users.name,
+                    profile_image: post.users.profile_image || '/images/default-profile.png'
+                  },
+                  images: post.images || [],
+                  likes: {
+                    count: post.likes?.length || 0,
+                    likedUsers: post.likes?.map((like: Like) => ({
+                      id: like.users.id,
+                      name: like.users.name,
+                      profile_image: like.users.profile_image || '/images/default-profile.png'
+                    })) || []
+                  },
+                  comments: (post.comments || [])
+                    .filter((comment: Comment) => !comment.parent_id)
+                    .map((comment: Comment) => ({
+                      id: comment.id,
+                      content: comment.content,
+                      user: {
+                        id: comment.users.id,
+                        name: comment.users.name,
+                        profile_image: comment.users.profile_image || '/images/default-profile.png'
+                      },
+                      createdAt: comment.created_at,
+                      replies: post.comments
+                        .filter((reply: Comment) => reply.parent_id === comment.id)
+                        .map((reply: Comment) => ({
+                          id: reply.id,
+                          content: reply.content,
+                          user: {
+                            id: reply.users.id,
+                            name: reply.users.name,
+                            profile_image: reply.users.profile_image || '/images/default-profile.png'
+                          },
+                          createdAt: reply.created_at
+                        }))
+                    }))
+                }))
             }))
         }));
 

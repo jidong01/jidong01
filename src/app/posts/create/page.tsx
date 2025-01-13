@@ -1,13 +1,14 @@
 'use client';
 
-import React, { useState, useMemo, useEffect, Suspense } from 'react';
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { TopNavigation } from "@/components/common/TopNavigation";
 import ImageDeleteIcon from '@/assets/icons/image-delete.svg';
 import CameraGrayIcon from '@/assets/icons/camera-gray.svg';
 import { useBoards } from '@/hooks/useBoards';
 import { usePosts } from '@/hooks/usePosts';
+import { supabase } from '@/lib/supabase';
 
 interface AttachedImage {
   id: string;
@@ -16,6 +17,7 @@ interface AttachedImage {
 }
 
 function CreatePostContent() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const { boardGroups, selectedGroupId, selectedBoardId, currentGroupName } = useBoards();
   const { editPost, addPost } = usePosts();
@@ -23,31 +25,44 @@ function CreatePostContent() {
   const isEditMode = searchParams.get('edit') === 'true';
   const postId = searchParams.get('postId');
 
-  const editingPost = useMemo(() => {
-    if (!isEditMode || !postId || !boardGroups.length) return null;
-
-    return boardGroups
-      .flatMap(group => group.boards)
-      .flatMap(board => board.posts)
-      .find(p => p.id === postId);
-  }, [isEditMode, postId, boardGroups]);
-
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [attachedImages, setAttachedImages] = useState<AttachedImage[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (editingPost) {
-      setTitle(editingPost.title);
-      setContent(editingPost.content);
-      setAttachedImages(
-        editingPost.images.map((url, index) => ({
-          id: `existing-${index}`,
-          url
-        }))
-      );
-    }
-  }, [editingPost]);
+    const loadPost = async () => {
+      if (isEditMode && postId) {
+        try {
+          const { data: post, error } = await supabase
+            .from('posts')
+            .select('*')
+            .eq('id', postId)
+            .single();
+
+          if (error) throw error;
+
+          if (post) {
+            setTitle(post.title);
+            setContent(post.content);
+            setAttachedImages(
+              (post.images || []).map((url: string, index: number) => ({
+                id: `existing-${index}`,
+                url
+              }))
+            );
+          }
+        } catch (err) {
+          console.error('게시글 로드 중 에러:', err);
+          alert('게시글을 불러오는데 실패했습니다.');
+          router.back();
+        }
+      }
+      setLoading(false);
+    };
+
+    loadPost();
+  }, [isEditMode, postId, router]);
 
   const boardTitle = isEditMode ? '게시글 수정' : '글쓰기';
   const boardSubtitle = '';
@@ -58,12 +73,12 @@ function CreatePostContent() {
     if (isFormEmpty) return;
 
     try {
-      if (isEditMode && postId && editingPost) {
+      if (isEditMode && postId) {
         await editPost(postId, {
           title: title.trim(),
           content: content.trim()
         });
-        window.history.back();
+        router.back();
       } else {
         if (!selectedGroupId || !selectedBoardId) {
           alert('게시판을 선택해주세요.');
@@ -80,8 +95,8 @@ function CreatePostContent() {
           title: title.trim(),
           content: content.trim(),
           author: {
-            id: '1',
-            name: '임시 사용자',
+            id: '',
+            name: '',
             profile_image: '/images/default-profile.png'
           },
           images: [],
@@ -97,7 +112,7 @@ function CreatePostContent() {
           .map(img => img.file!);
 
         await addPost(selectedBoardId, newPost, files);
-        window.location.href = '/';
+        router.push('/');
       }
     } catch (error) {
       console.error('Error submitting post:', error);
@@ -106,7 +121,7 @@ function CreatePostContent() {
   };
 
   const handleCancel = () => {
-    window.history.back();
+    router.back();
   };
 
   const handleDeleteImage = (id: string) => {
@@ -125,6 +140,25 @@ function CreatePostContent() {
 
     setAttachedImages(prev => [...newImages, ...prev]);
   };
+
+  if (loading) {
+    return (
+      <div className="flex justify-center min-h-screen bg-white">
+        <div className="w-full max-w-[390px] flex flex-col relative">
+          <TopNavigation
+            type="post-create"
+            title={boardTitle}
+            subtitle={boardSubtitle}
+            onLeftClick={handleCancel}
+            titleSize="small"
+          />
+          <div className="pt-[52px] flex justify-center items-center">
+            <div className="text-gray-500">로딩 중...</div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex justify-center min-h-screen bg-white">
@@ -204,9 +238,5 @@ function CreatePostContent() {
 }
 
 export default function CreatePostPage() {
-  return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <CreatePostContent />
-    </Suspense>
-  );
+  return <CreatePostContent />;
 }

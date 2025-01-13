@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { TopNavigation } from '@/components/common/TopNavigation';
 import { ProfileSection } from "@/components/menu/ProfileSection";
 import { BoardGroupSection } from "@/components/menu/BoardGroupSection";
@@ -11,7 +11,17 @@ import { supabase } from '@/lib/supabase';
 
 export default function MenuPage() {
   const { boardGroups } = useBoards();
-  const { name, profileImage } = useUser();
+  const { name, profileImage, loading } = useUser();
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      if (loading) {
+        window.location.reload();
+      }
+    }, 1500);
+
+    return () => clearTimeout(timeout);
+  }, [loading]);
 
   const handleLogout = async () => {
     try {
@@ -22,6 +32,30 @@ export default function MenuPage() {
       alert('로그아웃 중 오류가 발생했습니다.');
     }
   };
+
+  if (loading) {
+    return (
+      <>
+        <TopNavigation
+          type="menu"
+          title="메뉴"
+          onLeftClick={() => window.history.back()}
+          titleSize="large"
+        />
+        <div className="pt-[52px] w-full">
+          <div className="bg-white px-5 py-4">
+            <div className="animate-pulse h-20 bg-gray-200 rounded" />
+            <div className="mt-4 flex justify-center">
+              <div className="animate-pulse h-10 w-40 bg-gray-200 rounded" />
+            </div>
+          </div>
+          <div className="mt-2">
+            <div className="animate-pulse h-40 bg-gray-200 rounded mx-4" />
+          </div>
+        </div>
+      </>
+    );
+  }
 
   return (
     <>
