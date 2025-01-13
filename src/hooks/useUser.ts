@@ -10,21 +10,29 @@ export const useUser = () => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    const fetchUserProfile = async (user: SupabaseUser) => {
+      try {
+        const { data: profileData, error: profileError } = await supabase
+          .from('users')
+          .select('*')
+          .eq('id', user.id)
+          .single();
+
+        if (profileError) throw profileError;
+        setName(profileData?.name || null);
+        setProfileImageUrl(profileData?.profile_image || null);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : '사용자 정보를 불러오는데 실패했습니다.');
+      }
+    };
+
     const getCurrentUser = async () => {
       try {
         const { data: { user } } = await supabase.auth.getUser();
         setUser(user);
 
         if (user) {
-          const { data: profileData, error: profileError } = await supabase
-            .from('users')
-            .select('*')
-            .eq('id', user.id)
-            .single();
-
-          if (profileError) throw profileError;
-          setName(profileData?.name || null);
-          setProfileImageUrl(profileData?.profile_image || null);
+          await fetchUserProfile(user);
         }
       } catch (err) {
         setError(err instanceof Error ? err.message : '사용자 정보를 불러오는데 실패했습니다.');
@@ -34,6 +42,20 @@ export const useUser = () => {
     };
 
     getCurrentUser();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      setUser(session?.user || null);
+      if (session?.user) {
+        await fetchUserProfile(session.user);
+      } else {
+        setName(null);
+        setProfileImageUrl(null);
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
 
   return {

@@ -11,17 +11,23 @@ import { useUser } from "@/hooks/useUser";
 
 export default function MainPage() {
   const router = useRouter();
-  const { isAuthenticated } = useUser();
+  const { user, loading: userLoading } = useUser();
   const [selectedFilter, setSelectedFilter] = useState<'all' | 'popular'>('all');
   const { currentGroupName, currentBoardName, selectedGroupId, selectedBoardId, loading: boardsLoading } = useBoards();
 
   useEffect(() => {
-    if (!isAuthenticated) {
-      router.push('/login');
+    if (!userLoading && !user) {
+      router.replace('/login');
     }
-  }, [isAuthenticated, router]);
+  }, [user, userLoading, router]);
 
-  if (boardsLoading || !isAuthenticated) return null;
+  if (userLoading && !user) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="text-gray-500">로딩 중...</div>
+      </div>
+    );
+  }
 
   const handleCreatePost = () => {
     if (!selectedGroupId || !selectedBoardId) {
@@ -39,10 +45,7 @@ export default function MainPage() {
         type="main"
         title={title}
         subtitle={currentBoardName || undefined}
-        onLeftClick={() => {
-          const menuPath = window.location.pathname.includes('(main)') ? '/(main)/menu' : '/menu';
-          router.push(menuPath);
-        }}
+        onLeftClick={() => router.push('/menu')}
         onRightClick={() => router.push('/notifications')}
         titleSize={title === '전체 게시판' ? 'large' : 'small'}
       />
