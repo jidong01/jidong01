@@ -15,16 +15,12 @@ export default function MenuPage() {
   const [isInitialLoading, setIsInitialLoading] = useState(true);
 
   useEffect(() => {
-    if (!loading && isInitialLoading) {
-      setIsInitialLoading(false);
-    }
-
     const timeout = setTimeout(() => {
       setIsInitialLoading(false);
     }, 3000);
 
     return () => clearTimeout(timeout);
-  }, [loading, isInitialLoading]);
+  }, []);
 
   const handleLogout = async () => {
     try {
