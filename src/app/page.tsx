@@ -19,13 +19,13 @@ export default function MainPage() {
       try {
         const { data: { session } } = await supabase.auth.getSession();
         if (!session) {
-          window.location.href = '/login';
+          router.push('/login');
         } else {
           console.log('인증 확인 완료');
         }
       } catch (error) {
         console.error('인증 확인 중 오류 발생:', error);
-        window.location.href = '/login';
+        router.push('/login');
       }
     };
 
@@ -38,7 +38,7 @@ export default function MainPage() {
       alert('게시판을 선택해주세요.');
       return;
     }
-    window.location.href = '/posts/create';
+    router.push('/posts/create');
   };
 
   const title = currentGroupName ? currentGroupName : '전체 게시판';
@@ -49,8 +49,8 @@ export default function MainPage() {
         type="main"
         title={title}
         subtitle={currentBoardName || undefined}
-        onLeftClick={() => window.location.href = '/menu'}
-        onRightClick={() => window.location.href = '/notifications'}
+        onLeftClick={() => router.push('/menu')}
+        onRightClick={() => router.push('/notifications')}
         titleSize={title === '전체 게시판' ? 'large' : 'small'}
       />
       <div className="pt-[52px] bg-gray-50">

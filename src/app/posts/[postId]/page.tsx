@@ -7,8 +7,10 @@ import { CommentInput } from '@/components/comment/CommentInput';
 import { useState } from 'react';
 import { useBoards } from '@/hooks/useBoards';
 import { usePosts } from '@/hooks/usePosts';
+import { useRouter } from 'next/navigation';
 
 export default function PostDetailPage() {
+  const router = useRouter();
   const { postId } = useParams();
   const { currentGroupName, currentBoardName, loading: boardsLoading } = useBoards();
   const { posts } = usePosts();
@@ -33,7 +35,7 @@ export default function PostDetailPage() {
         type="detail"
         title={currentGroupName || '전체 게시판'}
         subtitle={currentBoardName || undefined}
-        onLeftClick={() => window.history.back()}
+        onLeftClick={() => router.back()}
       />
       <div className="pt-[52px] pb-[60px]">
         <Post 

@@ -5,10 +5,11 @@ import Image from 'next/image';
 import { TextField } from '@/components/common/TextField';
 import logo from '@/assets/images/logo.png';
 import { supabase } from '@/lib/supabase';
-
+import { useRouter } from 'next/navigation';
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const router = useRouter();
   // const [error, setError] = useState(''); 추후 사용하면 좋을 코드
 
   const handleLogin = async () => {
@@ -27,7 +28,7 @@ export default function LoginPage() {
       if (data.user) {
         // 세션이 설정될 때까지 잠시 대기
         await new Promise(resolve => setTimeout(resolve, 1000));
-        window.location.href = '/';
+        router.push('/');
       }
     } catch {
       // setError('로그인 중 오류가 발생했습니다.');
@@ -78,7 +79,7 @@ export default function LoginPage() {
               </span>
             </button>
             <button
-              onClick={() => window.location.href = '/signup'}
+              onClick={() => router.push('/signup')}
               className="flex justify-center items-center py-2 w-full h-9 bg-gray-50 rounded-[33px]"
             >
               <span className="text-sm font-semibold leading-5 tracking-[-0.2px] text-gray-400">

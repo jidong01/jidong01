@@ -21,7 +21,7 @@ export const useUser = () => {
       
       if (profileData) {
         setName(profileData.name || null);
-        setProfileImageUrl(profileData.profile_image_url || null);
+        setProfileImageUrl(profileData.profile_image || null);
       }
     } catch (err) {
       console.error('사용자 프로필 로드 에러:', err);

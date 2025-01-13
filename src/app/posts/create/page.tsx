@@ -8,6 +8,7 @@ import ImageDeleteIcon from '@/assets/icons/image-delete.svg';
 import CameraGrayIcon from '@/assets/icons/camera-gray.svg';
 import { useBoards } from '@/hooks/useBoards';
 import { usePosts } from '@/hooks/usePosts';
+import { useRouter } from 'next/navigation';
 
 interface AttachedImage {
   id: string;
@@ -16,6 +17,7 @@ interface AttachedImage {
 }
 
 function CreatePostContent() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const { boardGroups, selectedGroupId, selectedBoardId, currentGroupName } = useBoards();
   const { editPost, addPost } = usePosts();
@@ -63,7 +65,7 @@ function CreatePostContent() {
           title: title.trim(),
           content: content.trim()
         });
-        window.history.back();
+        router.back();
       } else {
         if (!selectedGroupId || !selectedBoardId) {
           alert('게시판을 선택해주세요.');
@@ -97,7 +99,7 @@ function CreatePostContent() {
           .map(img => img.file!);
 
         await addPost(selectedBoardId, newPost, files);
-        window.location.href = '/';
+        router.push('/');
       }
     } catch (error) {
       console.error('Error submitting post:', error);
@@ -106,7 +108,7 @@ function CreatePostContent() {
   };
 
   const handleCancel = () => {
-    window.location.href = '/';
+    router.push('/');
   };
 
   const handleDeleteImage = (id: string) => {

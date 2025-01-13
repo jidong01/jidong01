@@ -5,8 +5,10 @@ import { TextField } from '@/components/common/TextField';
 import { TopNavigation } from '@/components/common/TopNavigation';
 import { supabase } from '@/lib/supabase';
 import { isValidEmail, isValidPassword } from '@/lib/utils';
+import { useRouter } from 'next/navigation';
 
 export default function SignupPage() {
+  const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -81,7 +83,7 @@ export default function SignupPage() {
           return;
         }
         
-        window.location.href = '/';
+        router.push('/');
       }
     } catch {
       // setError('회원가입 중 오류가 발생했습니다.');
@@ -94,7 +96,7 @@ export default function SignupPage() {
       <TopNavigation
         type="signup"
         title="회원가입"
-        onLeftClick={() => window.location.href = '/login'}
+        onLeftClick={() => router.push('/login')}
         titleSize="large"
       />
       
